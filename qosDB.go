@@ -83,6 +83,16 @@ func (this Qos) getConfiabilidades(qoss []Qos) ([]float64){
     return confiabilidades
 }
 
+type Estadistica_Percentil struct {
+    nivel_factor string
+    minimo int
+    medio int
+    maximo int
+    factor string
+}
+
+
+
 func getData() []Qos{
     dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
         DB_USER, DB_PASSWORD, DB_NAME)
@@ -118,6 +128,16 @@ func getData() []Qos{
         qoss = append(qoss, temporal)
     }
     return qoss
+}
+
+func setData( ep Estadistica_Percentil) {
+    dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
+        DB_USER, DB_PASSWORD, DB_NAME)
+    db, err := sql.Open("postgres", dbinfo)
+    checkErr(err)
+    defer db.Close()
+    var lastInsertId int
+    err = db.QueryRow("INSERT INTO estadistica_percentil(nivel_factor, minimo, medio, maximo, factor) VALUES($1,$2,$3,$4,$5) returning id;", ep.nivel_factor, ep.minimo, ep.medio, ep.maximo, ep.factor).Scan(&lastInsertId)
 }
 
 func checkErr(err error) {
