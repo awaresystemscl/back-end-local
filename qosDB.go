@@ -6,12 +6,14 @@ import (
     _ "github.com/lib/pq"
 )
 
+//Declaracion de la cuenta de la base de datos
 const (
     DB_USER     = "workshop"
     DB_PASSWORD = "workshop2017"
     DB_NAME     = "workshop"
 )
 
+//Crear como una Clase Qos
 type Qos struct {
     id int
     rendimiento float64
@@ -23,6 +25,7 @@ type Qos struct {
     nombre string     
 }
 
+//Este es un metodo de Qos
 func (this Qos) getNombres(qoss []Qos) ([]string){
     var nombres []string
     for _, q := range qoss{
@@ -31,6 +34,7 @@ func (this Qos) getNombres(qoss []Qos) ([]string){
     return nombres
 }
 
+//Este es un metodo de Qos
 func (this Qos) getRendimientos(qoss []Qos) ([]float64){
     var rendimientos []float64
     for _, q := range qoss{
@@ -43,6 +47,7 @@ func (this Qos) getRendimientos(qoss []Qos) ([]float64){
     return rendimientos
 }
 
+//Este es un metodo de Qos
 func (this Qos) getLatencias(qoss []Qos) ([]float64){
     var latencias []float64
     for _, q := range qoss{
@@ -55,6 +60,7 @@ func (this Qos) getLatencias(qoss []Qos) ([]float64){
     return latencias
 }
 
+//Este es un metodo de Qos
 func (this Qos) getTiemposDeRespuestas(qoss []Qos) ([]float64){
     var tiemposDeRespuestas []float64
     for _, q := range qoss{
@@ -67,6 +73,7 @@ func (this Qos) getTiemposDeRespuestas(qoss []Qos) ([]float64){
     return tiemposDeRespuestas
 }
 
+//Este es un metodo de Qos
 func (this Qos) getDisponibilidades(qoss []Qos) ([]float64){
     var disponibilidades []float64
     for _, q := range qoss{
@@ -75,6 +82,7 @@ func (this Qos) getDisponibilidades(qoss []Qos) ([]float64){
     return disponibilidades
 }
 
+//Este es un metodo de Qos
 func (this Qos) getConfiabilidades(qoss []Qos) ([]float64){
     var confiabilidades []float64
     for _, q := range qoss{
@@ -83,16 +91,17 @@ func (this Qos) getConfiabilidades(qoss []Qos) ([]float64){
     return confiabilidades
 }
 
+//Crea una Clase Estadistica_Percentil
 type Estadistica_Percentil struct {
     nivel_factor string
     minimo int
     medio int
     maximo int
-    factor string
+    factor int
 }
 
 
-
+//Es un metodo en el aire
 func getData() []Qos{
     dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
         DB_USER, DB_PASSWORD, DB_NAME)
@@ -100,7 +109,8 @@ func getData() []Qos{
     checkErr(err)
     defer db.Close()
 
-    rows, err := db.Query("SELECT id,rendimiento,latencia,status,tiempo_de_respuesta,disponibilidad,confiabilidad,nombre FROM qos")
+    rows, err := db.Query("SELECT id,rendimiento,latencia,status,tiempo_de_respuesta,disponibilidad"+
+                            ",confiabilidad,nombre FROM qos")
     checkErr(err)
 
     var qoss []Qos
@@ -130,6 +140,7 @@ func getData() []Qos{
     return qoss
 }
 
+//otro metodo en el aire
 func setData( ep Estadistica_Percentil) {
     dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
         DB_USER, DB_PASSWORD, DB_NAME)
@@ -137,9 +148,12 @@ func setData( ep Estadistica_Percentil) {
     checkErr(err)
     defer db.Close()
     var lastInsertId int
-    err = db.QueryRow("INSERT INTO estadistica_percentil(nivel_factor, minimo, medio, maximo, factor) VALUES($1,$2,$3,$4,$5) returning id;", ep.nivel_factor, ep.minimo, ep.medio, ep.maximo, ep.factor).Scan(&lastInsertId)
+    err = db.QueryRow("INSERT INTO estadistica_percentil(nivel_factor, minimo, medio, maximo,"+
+                        " factor, categoria) VALUES($1,$2,$3,$4,$5,'Mapping') returning id;",
+                         ep.nivel_factor, ep.minimo, ep.medio, ep.maximo, ep.factor).Scan(&lastInsertId)
 }
 
+// es un try catch 
 func checkErr(err error) {
     if err != nil {
         panic(err)
