@@ -54,5 +54,6 @@ func send(body string, nombre string, email string) {
     if err != nil {
         log.Fatal(err)
     }
+    fmt.Println("Se le ha comunicada a: "+nombre+" al mail: "+email)
     
 }

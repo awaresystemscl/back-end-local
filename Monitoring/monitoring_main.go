@@ -21,44 +21,64 @@ func tipoFactor(factor int, test apiTest) (int){
 }
 
 func monitorearComponente(componenteId int, mashupId int){
-    componente := componenteId
+    componente := componenteId 
     mashup := mashupId
-    temporal1 := getApiTest(componente)
-    temporal2 := getComponentRules(componente)
-    temporal3 := getCatCuartil(componente)
+    apitests := getApiTest(componente) //obtengo ultimo test
+    componentRules := getComponentRules(componente) //obtengo restricciones de satisfaccion
+    cuartiles := getCatCuartil(componente)
 
-    for _, rule := range temporal2{ //requerimiento
-        for _, cuartil := range temporal3{ //cuartil
+    for _, rule := range componentRules{ //requerimiento
+        for _, cuartil := range cuartiles{ //cuartil
+            var insert satisfaccion_componente
             if cuartil.factor == rule.nombre && cuartil.nivel_factor == rule.nivel{ //si el cuartil es = al requerimiento
-                valor := tipoFactor(rule.nombre,temporal1) // se obtiene el valor del requerimiento
+                valor := tipoFactor(rule.nombre,apitests) // se obtiene el valor del requerimiento
+                if valor == -1 && (rule.nombre == 1 || rule.nombre == 3 || rule.nombre == 5) {
+                    valor = 10000
+                }
+                // if valor == -1 && (rule.nombre == 2 || rule.nombre == 4) {
+                //     valor = 0
+                // }
+                fmt.Println("------ TESTING Start ------")
+                fmt.Println(componente)
+                fmt.Println(rule.nombre)
+                // fmt.Println(rule.tendencia)
+                // fmt.Println(rule.tipoDeMedida)
+                fmt.Println(valor)
+                // fmt.Println("------ TESTING End------")
                 if rule.tendencia == true { // si la regla dice que es ** A LO MAS **
                     if rule.tipoDeMedida == "menor"{ // si la calidad aumenta a MENOR numero
                         if valor >= cuartil.medio {
-                            insert := satisfaccion_componente{componente_id:componente, satisfaccion:100, factor:rule.nombre, mashup_id:mashup }
+                            insert = satisfaccion_componente{componente_id:componente,
+                             satisfaccion:100, factor:rule.nombre, mashup_id:mashup }
                             setSatisfaccionCompo(insert)
                             // fmt.Println("100 "+strconv.Itoa(rule.nombre))
                         }else if valor <= cuartil.minimo {
-                            insert := satisfaccion_componente{componente_id:componente, satisfaccion:0, factor:rule.nombre, mashup_id:mashup }
+                            insert = satisfaccion_componente{componente_id:componente,
+                             satisfaccion:0, factor:rule.nombre, mashup_id:mashup }
                             setSatisfaccionCompo(insert)
                             // fmt.Println("0 "+strconv.Itoa(rule.nombre))
                         }else{
                             temporal:= int((valor-cuartil.minimo)*100/(cuartil.medio-cuartil.minimo))
-                            insert := satisfaccion_componente{componente_id:componente, satisfaccion:temporal, factor:rule.nombre, mashup_id:mashup }
+                            insert = satisfaccion_componente{componente_id:componente,
+                             satisfaccion:temporal, factor:rule.nombre, mashup_id:mashup }
                             setSatisfaccionCompo(insert)
                             // fmt.Println(strconv.Itoa(temporal)+strconv.Itoa(rule.nombre))
                         }
                     }else{ //si la calidad aumenta a MAYOR numero
                         if valor <= cuartil.medio {
-                            insert := satisfaccion_componente{componente_id:componente, satisfaccion:100, factor:rule.nombre, mashup_id:mashup }
+                            insert = satisfaccion_componente{componente_id:componente,
+                             satisfaccion:100, factor:rule.nombre, mashup_id:mashup }
                             setSatisfaccionCompo(insert)
                             // fmt.Println("100 "+strconv.Itoa(rule.nombre))
                         }else if valor >= cuartil.maximo {
-                            insert := satisfaccion_componente{componente_id:componente, satisfaccion:0, factor:rule.nombre, mashup_id:mashup }
+                            insert = satisfaccion_componente{componente_id:componente,
+                             satisfaccion:0, factor:rule.nombre, mashup_id:mashup }
                             setSatisfaccionCompo(insert)
                             // fmt.Println("0 "+strconv.Itoa(rule.nombre))
                         }else{
                             temporal:= int((cuartil.maximo-valor)*100/(cuartil.maximo-cuartil.medio))
-                            insert := satisfaccion_componente{componente_id:componente, satisfaccion:temporal, factor:rule.nombre, mashup_id:mashup }
+                            insert = satisfaccion_componente{componente_id:componente,
+                             satisfaccion:temporal, factor:rule.nombre, mashup_id:mashup }
                             setSatisfaccionCompo(insert)
                             // fmt.Println(strconv.Itoa(temporal)+strconv.Itoa(rule.nombre))
                         }
@@ -66,54 +86,68 @@ func monitorearComponente(componenteId int, mashupId int){
                 }else{ // en caso de que sea ** A LO MENOS ** que seria decir false
                     if rule.tipoDeMedida == "menor"{ // si la calidad aumenta a MENOR numero
                         if valor <= cuartil.medio {
-                            insert := satisfaccion_componente{componente_id:componente, satisfaccion:100, factor:rule.nombre, mashup_id:mashup }
+                            insert = satisfaccion_componente{componente_id:componente,
+                             satisfaccion:100, factor:rule.nombre, mashup_id:mashup }
                             setSatisfaccionCompo(insert)
                             // fmt.Println("100 "+strconv.Itoa(rule.nombre))
                         }else if valor >= cuartil.maximo {
-                            insert := satisfaccion_componente{componente_id:componente, satisfaccion:0, factor:rule.nombre, mashup_id:mashup }
+                            insert = satisfaccion_componente{componente_id:componente,
+                             satisfaccion:0, factor:rule.nombre, mashup_id:mashup }
                             setSatisfaccionCompo(insert)
                             // fmt.Println("0 "+strconv.Itoa(rule.nombre))
                         }else{
                             temporal:= int((cuartil.maximo-valor)*100/(cuartil.maximo-cuartil.medio))
-                            insert := satisfaccion_componente{componente_id:componente, satisfaccion:temporal, factor:rule.nombre, mashup_id:mashup }
+                            insert = satisfaccion_componente{componente_id:componente,
+                             satisfaccion:temporal, factor:rule.nombre, mashup_id:mashup }
                             setSatisfaccionCompo(insert)
                             // fmt.Println(strconv.Itoa(temporal)+strconv.Itoa(rule.nombre))
                         }
                     }else{ //si la calidad aumenta a MAYOR numero
                         if valor >= cuartil.medio {
-                            insert := satisfaccion_componente{componente_id:componente, satisfaccion:100, factor:rule.nombre, mashup_id:mashup }
+                            insert = satisfaccion_componente{componente_id:componente,
+                             satisfaccion:100, factor:rule.nombre, mashup_id:mashup }
                             setSatisfaccionCompo(insert)
                             // fmt.Println("100 "+strconv.Itoa(rule.nombre))
                         }else if valor <= cuartil.minimo {
-                            insert := satisfaccion_componente{componente_id:componente, satisfaccion:0, factor:rule.nombre, mashup_id:mashup }
+                            insert = satisfaccion_componente{componente_id:componente,
+                             satisfaccion:0, factor:rule.nombre, mashup_id:mashup }
                             setSatisfaccionCompo(insert)
                             // fmt.Println("0 "+strconv.Itoa(rule.nombre))
                         }else{
                             temporal:= int((valor-cuartil.medio)*100/(cuartil.medio-cuartil.minimo))
-                            insert := satisfaccion_componente{componente_id:componente, satisfaccion:temporal, factor:rule.nombre, mashup_id:mashup }
+                            insert = satisfaccion_componente{componente_id:componente,
+                             satisfaccion:temporal, factor:rule.nombre, mashup_id:mashup }
                             setSatisfaccionCompo(insert)
                             // fmt.Println(strconv.Itoa(temporal)+strconv.Itoa(rule.nombre))
                         }
                     }
                 }
+
+            fmt.Println(insert)
             }
         }        
     }
 }
 
 func main() {
-    componentes := getComponentes()
+    componentes := getComponentes() // se obtienen todos los componentes
     // fmt.Println(componentes)
-    // fmt.Println("------------")
+    fmt.Println("------ Satisfaccion por Componente ------")
     for _, componente := range componentes{
         monitorearComponente(componente.id, componente.mashup_id)
     }
     conjunto_compo := getSatisfaccion()
     setConjuntoCompo(conjunto_compo)
-    // fmt.Println(conjunto_compo)
+    fmt.Println("------ Satisfaccion Agrupada por Componentes ------")
+    for _, cc := range conjunto_compo{
+        fmt.Println(cc)
+    }
     conjunto_mashup := getConjuntoCompo()
     setConjuntoMashup(conjunto_mashup)
-    // fmt.Println(conjunto_mashup)
+    fmt.Println("------ Satisfaccion Agrupada por Mashups ------")
+    for _, cm := range conjunto_mashup{
+        fmt.Println(cm)
+    }
 }
 //58
 

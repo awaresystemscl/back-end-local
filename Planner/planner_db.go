@@ -9,9 +9,9 @@ import (
 )
 
 const (
-    DB_USER     = "workshop"
-    DB_PASSWORD = "workshop2017"
-    DB_NAME     = "workshop"
+    DB_USER     = "awaresystems"
+    DB_PASSWORD = "3ee798d8"
+    DB_NAME     = "awaresystems"
 )
 
 type usuarioMashup struct {
@@ -47,10 +47,15 @@ func getAlertas() []usuarioMashup{
     defer db.Close()
 
     // rows, err := db.Query("SELECT mashup_id from alertas")
-    rows, err := db.Query("SELECT alertas.mashup_id, mashups.nombre, mashups.limite, usuarios.nombre, usuarios.email, conjunto_satisfaccion_mashup.avg"+
-    					" from alertas join mashups on mashups.id = alertas.mashup_id "+
+    rows, err := db.Query("SELECT DISTINCT on (alertas.mashup_id) "+
+                        "alertas.mashup_id, mashups.nombre, mashups.limite, usuarios.nombre, "+
+                        "usuarios.email, conjunto_satisfaccion_mashup.avg "+
+    					"from alertas join mashups on mashups.id = alertas.mashup_id "+
     					"join usuarios on usuarios.id = mashups.usuario_id "+
-    					"join conjunto_satisfaccion_mashup on mashups.id = conjunto_satisfaccion_mashup.mashup_id")
+    					"join conjunto_satisfaccion_mashup on mashups.id = conjunto_satisfaccion_mashup.mashup_id "+
+                        "where to_char(alertas.fecha,'DD-MM-YYYY') = to_char((select to_date(to_char(fecha,'DD-MM-YYYY'),'DD-MM-YYYY') "+
+                        "from alertas order by fecha desc limit 1),'DD-MM-YYYY') "+
+                        "and to_char(alertas.fecha,'DD-MM-YYYY') = to_char(conjunto_satisfaccion_mashup.fecha,'DD-MM-YYYY')")
 
     checkErr(err)
 
@@ -81,7 +86,10 @@ func getComponentesMashup(idMashup int) []componente{
     rows, err := db.Query("select componentes.id, componentes.categoria, apis.nombre, conjunto_satisfaccion_compo.avg"+
     					" from componentes join apis on componentes.api_id = apis.id "+
     					"join conjunto_satisfaccion_compo on componentes.id = conjunto_satisfaccion_compo.componente_id "+
-    					"where componentes.mashup_id = "+strconv.Itoa(idMashup))
+    					"where componentes.mashup_id = "+strconv.Itoa(idMashup)+
+                        "and to_char(conjunto_satisfaccion_compo.fecha,'DD-MM-YYYY') = "+
+                        "to_char((select to_date(to_char(fecha,'DD-MM-YYYY'),'DD-MM-YYYY') "+
+                        "from conjunto_satisfaccion_compo order by fecha desc limit 1),'DD-MM-YYYY')" )
     checkErr(err)
 
     var componentes []componente
@@ -106,11 +114,15 @@ func getRestricciones(idComponente int) []restriccion{
     defer db.Close()
 
     // rows, err := db.Query("SELECT mashup_id from alertas")
-    rows, err := db.Query("select factores.nombre, relacion_com_fac.nivel, relacion_com_fac.tendencia, satisfaccion_componente.satisfaccion"+
+    rows, err := db.Query("select factores.nombre, relacion_com_fac.nivel, relacion_com_fac.tendencia,"+
+                        " satisfaccion_componente.satisfaccion"+
     					" from relacion_com_fac join factores on relacion_com_fac.factor_id = factores.id "+
     					"join satisfaccion_componente "+
-    					"on satisfaccion_componente.factor = factor_id and satisfaccion_componente.componente_id = "+strconv.Itoa(idComponente)+
-    					"where relacion_com_fac.componente_id = "+strconv.Itoa(idComponente))
+    					"on satisfaccion_componente.factor_id = relacion_com_fac.factor_id and satisfaccion_componente.componente_id = "+strconv.Itoa(idComponente)+
+    					"where relacion_com_fac.componente_id = "+strconv.Itoa(idComponente)+
+                        " and to_char(satisfaccion_componente.fecha,'DD-MM-YYYY') = "+
+                        "to_char((select to_date(to_char(fecha,'DD-MM-YYYY'),'DD-MM-YYYY') "+
+                        "from satisfaccion_componente order by fecha desc limit 1),'DD-MM-YYYY')")
     checkErr(err)
 
     var restricciones []restriccion

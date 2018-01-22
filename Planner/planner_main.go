@@ -2,6 +2,7 @@ package main
 
 import (
     "strconv"
+    "fmt"
 )
 type mashup struct {
     id int
@@ -19,6 +20,7 @@ func masMenos(restriccion bool)string{
 func main() {
 	alertas := getAlertas()
     for i, alerta := range alertas{
+        fmt.Println(alerta)
         componentes := getComponentesMashup(alerta.mashup_id)
         alertas[i].componentes = componentes
         for j, c := range componentes{
@@ -29,9 +31,9 @@ func main() {
     for _, alerta := range alertas{
         var mensaje string
         mensaje = "Estimad@ "+alerta.nombre+"\n\nLe informamos que la aplicacion "+alerta.mashup_nombre+
-                    " que usa las categorias de tipo: \n"
+                    " el cual contiene los siguientes componentes: \n"
         for _, c := range alerta.componentes{
-            mensaje = mensaje+"- "+c.categoria+"("+c.nombre+")\n"
+            mensaje = mensaje+"- "+c.nombre+"("+c.categoria+")\n"
         }
         mensaje = mensaje+"Tienen una satisfaccion inferior al rango que usted considera como correcto ("+
                     strconv.Itoa(alerta.mashup_limite)+"%) presentando una satisfaccion de "+
@@ -50,5 +52,6 @@ func main() {
         }
     mensaje = mensaje+"\n Equipo AwareSystems"
     send(mensaje,alerta.nombre,alerta.email)
+    fmt.Println(mensaje)
     }
 }

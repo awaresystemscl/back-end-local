@@ -6,13 +6,13 @@ import (
     "fmt"
     _ "github.com/lib/pq"
     "time"
-    // "strconv"
+    "strconv"
 )
 
 const (
-    DB_USER     = "workshop"
-    DB_PASSWORD = "workshop2017"
-    DB_NAME     = "workshop"
+    DB_USER     = "awaresystems"
+    DB_PASSWORD = "3ee798d8"
+    DB_NAME     = "awaresystems"
 )
 
 type conjunto_mashup_sati struct {
@@ -21,14 +21,19 @@ type conjunto_mashup_sati struct {
     usuario_id int
 }
 
-func getConjuntoMashups() []conjunto_mashup_sati{
+func getConjuntoMashups(mashup_id int) []conjunto_mashup_sati{
     dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
         DB_USER, DB_PASSWORD, DB_NAME)
     db, err := sql.Open("postgres", dbinfo)
     checkErr(err)
     defer db.Close()
 
-    rows, err := db.Query("SELECT mashup_id, avg, usuario_id FROM conjunto_satisfaccion_mashup")
+    // rows, err := db.Query("SELECT mashup_id, avg, usuario_id FROM conjunto_satisfaccion_mashup"+
+    //                     "where to_char(fecha,'DD-MM-YYYY') = to_char((select to_date(to_char(fecha,'DD-MM-YYYY'),'DD-MM-YYYY') "+
+    //                     "from conjunto_satisfaccion_mashup order by fecha desc limit 1),'DD-MM-YYYY')")
+    rows, err := db.Query("SELECT mashup_id, avg, usuario_id FROM conjunto_satisfaccion_mashup "+
+                        "where conjunto_satisfaccion_mashup.mashup_id = "+strconv.Itoa(mashup_id)+
+                        " limit 10")
     checkErr(err)
 
     var conjunto []conjunto_mashup_sati
@@ -55,6 +60,26 @@ func setAlerta(violados []int) {
 	    _, err = db.Exec("INSERT INTO alertas (mashup_id, fecha) VALUES($1,$2)", v, time.Now())
 	    checkErr(err)
     }
+}
+
+func getMashups() []mashup{
+    dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
+        DB_USER, DB_PASSWORD, DB_NAME)
+    db, err := sql.Open("postgres", dbinfo)
+    checkErr(err)
+    defer db.Close()
+
+    rows, err := db.Query("SELECT id, limite FROM mashups")
+    checkErr(err)
+
+    var mashups []mashup
+    for rows.Next() {
+        var mashupT mashup
+        err = rows.Scan(&mashupT.id,&mashupT.umbral)
+        checkErr(err)
+        mashups = append(mashups, mashupT)
+    }
+    return mashups
 }
 
 func checkErr(err error) {

@@ -9,9 +9,9 @@ import (
 )
 
 const (
-    DB_USER     = "workshop"
-    DB_PASSWORD = "workshop2017"
-    DB_NAME     = "workshop"
+    DB_USER     = "awaresystems"
+    DB_PASSWORD = "3ee798d8"
+    DB_NAME     = "awaresystems"
 )
 
 type apiTest struct {
@@ -65,20 +65,21 @@ type conjunto_mashup_sati struct {
     usuario_id int
 }
 
+//Toma el ultimo test del api asociado al componente
 func getApiTest( componenteId int) (apiTest){
     dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
         DB_USER, DB_PASSWORD, DB_NAME)
     db, err := sql.Open("postgres", dbinfo)
     checkErr(err)
     defer db.Close()
-    select1 := "select qos.rendimiento, qos.latencia, qos.tiempo_de_respuesta, qos.confiabilidad, qos.disponibilidad "+
+    select1 := "select apis_data_test.rendimiento, apis_data_test.latencia, apis_data_test.tiempo_de_respuesta, apis_data_test.confiabilidad, apis_data_test.disponibilidad "+
                 "from componentes "+
                 "left join apis "+
                 "on componentes.api_id = apis.id "+ 
-                "join qos "+
-                "on apis.nombre = qos.nombre "+
+                "join apis_data_test "+
+                "on apis.nombre = apis_data_test.nombre "+
                 "where componentes.id = "+strconv.Itoa(componenteId)+
-                " order by qos.fecha asc "+
+                " order by apis_data_test.fecha desc "+
                 "limit 1"
     var test apiTest
     rows, err := db.Query(select1)
@@ -126,15 +127,18 @@ func getComponentRules(componenteId int) ([]compoRule){
     return rules
 }
 
+//obtengo el cuartil basado en la categoria del componente
 func getCatCuartil(componenteId int) ([]catCuartil){
     dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
         DB_USER, DB_PASSWORD, DB_NAME)
     db, err := sql.Open("postgres", dbinfo)
     checkErr(err)
     defer db.Close()
-    select1 := "select nivel_factor, minimo, medio, maximo, factor from estadistica_percentil "+
-                "where estadistica_percentil.categoria = "+
-                "(select categoria from componentes where id = "+strconv.Itoa(componenteId)+")"
+    select1 := "select nivel_factor, minimo, medio, maximo, factor_id from estadistica_cuartil "+
+                "where estadistica_cuartil.categoria = "+
+                "(select categoria from componentes where id = "+strconv.Itoa(componenteId)+
+                " and to_char(fecha,'DD-MM-YYYY') = to_char((select to_date(to_char(fecha,'DD-MM-YYYY'),'DD-MM-YYYY') "+
+                "from estadistica_cuartil order by fecha desc limit 1),'DD-MM-YYYY'))"
     var cuartil []catCuartil
     rows, err := db.Query(select1)
     checkErr(err)
@@ -153,6 +157,7 @@ func getCatCuartil(componenteId int) ([]catCuartil){
     return cuartil
 }
 
+//Obtengo los id y mashup_id de todos los componentes
 func getComponentes() []componente{
     dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
         DB_USER, DB_PASSWORD, DB_NAME)
@@ -181,7 +186,7 @@ func setSatisfaccionCompo(satisfaccionComp satisfaccion_componente) {
     db, err := sql.Open("postgres", dbinfo)
     checkErr(err)
     defer db.Close()
-    _, err = db.Exec("INSERT INTO satisfaccion_componente (componente_id, satisfaccion, fecha, factor, mashup_id) VALUES($1,$2,$3,$4,$5)",
+    _, err = db.Exec("INSERT INTO satisfaccion_componente (componente_id, satisfaccion, fecha, factor_id, mashup_id) VALUES($1,$2,$3,$4,$5)",
                     satisfaccionComp.componente_id, satisfaccionComp.satisfaccion, time.Now(), satisfaccionComp.factor, satisfaccionComp.mashup_id)
     checkErr(err)
 }
@@ -193,7 +198,10 @@ func getSatisfaccion() ([]conjunto_compo_sati){
     checkErr(err)
     defer db.Close()
     select1 := "select componentes.id , satisfaccion.avg, componentes.mashup_id "+
-                "from (select componente_id, avg(satisfaccion) from satisfaccion_componente group by componente_id) as satisfaccion "+
+                "from (select componente_id, avg(satisfaccion) from satisfaccion_componente"+
+                " where to_char(fecha,'DD-MM-YYYY') = to_char((select to_date(to_char(fecha,'DD-MM-YYYY'),'DD-MM-YYYY')"+
+                " from satisfaccion_componente order by fecha desc limit 1),'DD-MM-YYYY')"+
+                " group by componente_id) as satisfaccion "+
                 "join componentes "+
                 "on componentes.id = satisfaccion.componente_id"
     var conjuntos []conjunto_compo_sati
@@ -232,7 +240,11 @@ func getConjuntoCompo() ([]conjunto_mashup_sati){
     checkErr(err)
     defer db.Close()
     select1 := "select satisfaccion.mashup_id , satisfaccion.avg, mashups.usuario_id "+
-                "from (select mashup_id, avg(conjunto_satisfaccion_compo.avg) from conjunto_satisfaccion_compo group by mashup_id) as satisfaccion "+
+                "from (select mashup_id, avg(conjunto_satisfaccion_compo.avg)"+
+                " from conjunto_satisfaccion_compo "+
+                " where to_char(fecha,'DD-MM-YYYY') = to_char((select to_date(to_char(fecha,'DD-MM-YYYY'),'DD-MM-YYYY')"+
+                " from conjunto_satisfaccion_compo order by fecha desc limit 1),'DD-MM-YYYY')"+
+                "group by mashup_id) as satisfaccion "+
                 "join mashups "+
                 "on mashups.id = satisfaccion.mashup_id"
     var conjuntos []conjunto_mashup_sati
