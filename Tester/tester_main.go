@@ -86,7 +86,7 @@ func main() {
         qosTemp := obtenerMetricas(dataApi.url, dataApi.nombre)
         fmt.Println(qosTemp)
         fmt.Println("=======================================================================")
-        // setData(qosTemp)
+        setData(qosTemp)
     }
     fmt.Println("El test se ha ejecutado en: ",float64(int(time.Since(tiempoDeScript).Seconds() * 1000)) / 1000)
 }
