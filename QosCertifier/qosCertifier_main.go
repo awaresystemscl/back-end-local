@@ -3,12 +3,23 @@ package main
 import (
     "fmt"
     "sort"
+    "encoding/json"
+    "io/ioutil"
 )
 
 //Esto declara como la clase Quartil
 type Quartile struct {
 
 }
+
+type configDB struct {
+    Host string `json:"HOST_IP"` 
+    User string `json:"DB_USER"`
+    Pass string `json:"DB_PASSWORD"`
+    Name string `json:"DB_NAME"`
+}
+
+var db_config configDB
 
 //Estructura de los metodos:
 // (clase Nombre_de_la_Clase) metodo(Parametros_de_entrada) (Parametros_de_salida)opcional*
@@ -213,18 +224,19 @@ func agregarGrupo(g GrupoDeApis){
 }
 
 func main() {
-
-    // apiDataTest := new(ApiDataTest)
+    db_config = configuracion()
     pruebas := getData()
     grupos := agrupar(pruebas)
     for _, g := range grupos{
         agregarGrupo(g)
     }
+}
 
-
-
-
-    
-    // arreglo := []float64{5,6,4,8,7,1,3,9,2}
+func configuracion() configDB{
+    jsonFile, err := ioutil.ReadFile("../config.json")
+    checkErr(err)
+    var config configDB
+    json.Unmarshal(jsonFile, &config)
+    return config
 }
 //58

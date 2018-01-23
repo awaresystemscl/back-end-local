@@ -6,7 +6,18 @@ import (
     "net/http"
     "net/http/httptrace"
     "time"
+    "encoding/json"
+    "io/ioutil"
 )
+
+type configDB struct {
+    Host string `json:"HOST_IP"` 
+    User string `json:"DB_USER"`
+    Pass string `json:"DB_PASSWORD"`
+    Name string `json:"DB_NAME"`
+}
+
+var db_config configDB
 
 type apis_data_test struct {
     rendimiento int
@@ -67,15 +78,24 @@ func obtenerMetricas(urlApi,nombreApi string) (apis_data_test){
 }
 
 func main() {
+    db_config = configuracion()
     tiempoDeScript := time.Now()
     dataApis := getData() //obtener apis
     fmt.Println("=======================================================================")
     for _, dataApi := range dataApis{ //recorrer apis
         qosTemp := obtenerMetricas(dataApi.url, dataApi.nombre)
-        fmt.Println()
+        fmt.Println(qosTemp)
         fmt.Println("=======================================================================")
-        setData(qosTemp)
+        // setData(qosTemp)
     }
     fmt.Println("El test se ha ejecutado en: ",float64(int(time.Since(tiempoDeScript).Seconds() * 1000)) / 1000)
+}
+
+func configuracion() configDB{
+    jsonFile, err := ioutil.ReadFile("../config.json")
+    checkErr(err)
+    var config configDB
+    json.Unmarshal(jsonFile, &config)
+    return config
 }
 //58

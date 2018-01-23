@@ -7,12 +7,6 @@ import (
     "time"
 )
 
-const (
-    DB_USER     = "awaresystems"
-    DB_PASSWORD = "3ee798d8"
-    DB_NAME     = "awaresystems"
-)
-
 type api struct {
     id int
     nombre string
@@ -21,8 +15,8 @@ type api struct {
 }
 
 func getData() []api{
-    dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
-        DB_USER, DB_PASSWORD, DB_NAME)
+    dbinfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+        db_config.Host, db_config.User, db_config.Pass, db_config.Name)
     db, err := sql.Open("postgres", dbinfo)
     checkErr(err)
     defer db.Close()
@@ -45,8 +39,8 @@ func getData() []api{
 }
 
 func getCount(nombreApi string) (float64, float64, float64){
-    dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
-        DB_USER, DB_PASSWORD, DB_NAME)
+    dbinfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+        db_config.Host, db_config.User, db_config.Pass, db_config.Name)
     db, err := sql.Open("postgres", dbinfo)
     checkErr(err)
     defer db.Close()
@@ -76,8 +70,8 @@ func getCount(nombreApi string) (float64, float64, float64){
 }
 
 func setData(apis_data_testInsert apis_data_test) {
-    dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
-        DB_USER, DB_PASSWORD, DB_NAME)
+    dbinfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+        db_config.Host, db_config.User, db_config.Pass, db_config.Name)
     db, err := sql.Open("postgres", dbinfo)
     checkErr(err)
     defer db.Close()

@@ -8,12 +8,6 @@ import (
     "strconv"
 )
 
-const (
-    DB_USER     = "awaresystems"
-    DB_PASSWORD = "3ee798d8"
-    DB_NAME     = "awaresystems"
-)
-
 type usuarioMashup struct {
     mashup_id int
     mashup_nombre string
@@ -40,8 +34,8 @@ type restriccion struct {
 }
 
 func getAlertas() []usuarioMashup{
-    dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
-        DB_USER, DB_PASSWORD, DB_NAME)
+    dbinfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+        db_config.Host, db_config.User, db_config.Pass, db_config.Name)
     db, err := sql.Open("postgres", dbinfo)
     checkErr(err)
     defer db.Close()
@@ -76,8 +70,8 @@ func getAlertas() []usuarioMashup{
 }
 
 func getComponentesMashup(idMashup int) []componente{
-    dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
-        DB_USER, DB_PASSWORD, DB_NAME)
+    dbinfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+        db_config.Host, db_config.User, db_config.Pass, db_config.Name)
     db, err := sql.Open("postgres", dbinfo)
     checkErr(err)
     defer db.Close()
@@ -107,8 +101,8 @@ func getComponentesMashup(idMashup int) []componente{
 }
 
 func getRestricciones(idComponente int) []restriccion{
-    dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
-        DB_USER, DB_PASSWORD, DB_NAME)
+    dbinfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+        db_config.Host, db_config.User, db_config.Pass, db_config.Name)
     db, err := sql.Open("postgres", dbinfo)
     checkErr(err)
     defer db.Close()

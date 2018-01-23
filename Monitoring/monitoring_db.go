@@ -8,12 +8,6 @@ import (
     "strconv"
 )
 
-const (
-    DB_USER     = "awaresystems"
-    DB_PASSWORD = "3ee798d8"
-    DB_NAME     = "awaresystems"
-)
-
 type apiTest struct {
     rendimiento int
     latencia int
@@ -67,8 +61,8 @@ type conjunto_mashup_sati struct {
 
 //Toma el ultimo test del api asociado al componente
 func getApiTest( componenteId int) (apiTest){
-    dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
-        DB_USER, DB_PASSWORD, DB_NAME)
+    dbinfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+        db_config.Host, db_config.User, db_config.Pass, db_config.Name)
     db, err := sql.Open("postgres", dbinfo)
     checkErr(err)
     defer db.Close()
@@ -100,8 +94,8 @@ func getApiTest( componenteId int) (apiTest){
 }
 
 func getComponentRules(componenteId int) ([]compoRule){
-    dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
-        DB_USER, DB_PASSWORD, DB_NAME)
+    dbinfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+        db_config.Host, db_config.User, db_config.Pass, db_config.Name)
     db, err := sql.Open("postgres", dbinfo)
     checkErr(err)
     defer db.Close()
@@ -129,8 +123,8 @@ func getComponentRules(componenteId int) ([]compoRule){
 
 //obtengo el cuartil basado en la categoria del componente
 func getCatCuartil(componenteId int) ([]catCuartil){
-    dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
-        DB_USER, DB_PASSWORD, DB_NAME)
+    dbinfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+        db_config.Host, db_config.User, db_config.Pass, db_config.Name)
     db, err := sql.Open("postgres", dbinfo)
     checkErr(err)
     defer db.Close()
@@ -159,8 +153,8 @@ func getCatCuartil(componenteId int) ([]catCuartil){
 
 //Obtengo los id y mashup_id de todos los componentes
 func getComponentes() []componente{
-    dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
-        DB_USER, DB_PASSWORD, DB_NAME)
+    dbinfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+        db_config.Host, db_config.User, db_config.Pass, db_config.Name)
     db, err := sql.Open("postgres", dbinfo)
     checkErr(err)
     defer db.Close()
@@ -181,8 +175,8 @@ func getComponentes() []componente{
 }
 
 func setSatisfaccionCompo(satisfaccionComp satisfaccion_componente) {
-    dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
-        DB_USER, DB_PASSWORD, DB_NAME)
+    dbinfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+        db_config.Host, db_config.User, db_config.Pass, db_config.Name)
     db, err := sql.Open("postgres", dbinfo)
     checkErr(err)
     defer db.Close()
@@ -192,8 +186,8 @@ func setSatisfaccionCompo(satisfaccionComp satisfaccion_componente) {
 }
 
 func getSatisfaccion() ([]conjunto_compo_sati){
-    dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
-        DB_USER, DB_PASSWORD, DB_NAME)
+    dbinfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+        db_config.Host, db_config.User, db_config.Pass, db_config.Name)
     db, err := sql.Open("postgres", dbinfo)
     checkErr(err)
     defer db.Close()
@@ -220,8 +214,8 @@ func getSatisfaccion() ([]conjunto_compo_sati){
 }
 
 func setConjuntoCompo(conjuntos []conjunto_compo_sati) {
-    dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
-        DB_USER, DB_PASSWORD, DB_NAME)
+    dbinfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+        db_config.Host, db_config.User, db_config.Pass, db_config.Name)
     db, err := sql.Open("postgres", dbinfo)
     checkErr(err)
     defer db.Close()
@@ -234,8 +228,8 @@ func setConjuntoCompo(conjuntos []conjunto_compo_sati) {
 }
 
 func getConjuntoCompo() ([]conjunto_mashup_sati){
-    dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
-        DB_USER, DB_PASSWORD, DB_NAME)
+    dbinfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+        db_config.Host, db_config.User, db_config.Pass, db_config.Name)
     db, err := sql.Open("postgres", dbinfo)
     checkErr(err)
     defer db.Close()
@@ -263,8 +257,8 @@ func getConjuntoCompo() ([]conjunto_mashup_sati){
 }
 
 func setConjuntoMashup(conjuntosMashup []conjunto_mashup_sati) {
-    dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
-        DB_USER, DB_PASSWORD, DB_NAME)
+    dbinfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+        db_config.Host, db_config.User, db_config.Pass, db_config.Name)
     db, err := sql.Open("postgres", dbinfo)
     checkErr(err)
     defer db.Close()

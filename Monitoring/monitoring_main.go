@@ -2,6 +2,9 @@ package main
 
 import (
     "fmt"
+    "encoding/json"
+    "io/ioutil"
+
 )
 func tipoFactor(factor int, test apiTest) (int){
     var valor int
@@ -19,6 +22,15 @@ func tipoFactor(factor int, test apiTest) (int){
     }
     return valor
 }
+
+type configDB struct {
+    Host string `json:"HOST_IP"` 
+    User string `json:"DB_USER"`
+    Pass string `json:"DB_PASSWORD"`
+    Name string `json:"DB_NAME"`
+}
+
+var db_config configDB
 
 func monitorearComponente(componenteId int, mashupId int){
     componente := componenteId 
@@ -130,6 +142,7 @@ func monitorearComponente(componenteId int, mashupId int){
 }
 
 func main() {
+    db_config = configuracion()
     componentes := getComponentes() // se obtienen todos los componentes
     // fmt.Println(componentes)
     fmt.Println("------ Satisfaccion por Componente ------")
@@ -148,6 +161,13 @@ func main() {
     for _, cm := range conjunto_mashup{
         fmt.Println(cm)
     }
+}
+func configuracion() configDB{
+    jsonFile, err := ioutil.ReadFile("../config.json")
+    checkErr(err)
+    var config configDB
+    json.Unmarshal(jsonFile, &config)
+    return config
 }
 //58
 

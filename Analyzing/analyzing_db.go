@@ -9,11 +9,6 @@ import (
     "strconv"
 )
 
-const (
-    DB_USER     = "awaresystems"
-    DB_PASSWORD = "3ee798d8"
-    DB_NAME     = "awaresystems"
-)
 
 type conjunto_mashup_sati struct {
     mashup_id int
@@ -22,8 +17,8 @@ type conjunto_mashup_sati struct {
 }
 
 func getConjuntoMashups(mashup_id int) []conjunto_mashup_sati{
-    dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
-        DB_USER, DB_PASSWORD, DB_NAME)
+    dbinfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+        db_config.Host, db_config.User, db_config.Pass, db_config.Name)
     db, err := sql.Open("postgres", dbinfo)
     checkErr(err)
     defer db.Close()
@@ -33,7 +28,7 @@ func getConjuntoMashups(mashup_id int) []conjunto_mashup_sati{
     //                     "from conjunto_satisfaccion_mashup order by fecha desc limit 1),'DD-MM-YYYY')")
     rows, err := db.Query("SELECT mashup_id, avg, usuario_id FROM conjunto_satisfaccion_mashup "+
                         "where conjunto_satisfaccion_mashup.mashup_id = "+strconv.Itoa(mashup_id)+
-                        " limit 10")
+                        " limit "+strconv.Itoa(db_config.Ventana))
     checkErr(err)
 
     var conjunto []conjunto_mashup_sati
@@ -50,8 +45,8 @@ func getConjuntoMashups(mashup_id int) []conjunto_mashup_sati{
 }
 
 func setAlerta(violados []int) {
-    dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
-        DB_USER, DB_PASSWORD, DB_NAME)
+    dbinfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+        db_config.Host, db_config.User, db_config.Pass, db_config.Name)
     db, err := sql.Open("postgres", dbinfo)
     checkErr(err)
     defer db.Close()
@@ -63,8 +58,8 @@ func setAlerta(violados []int) {
 }
 
 func getMashups() []mashup{
-    dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
-        DB_USER, DB_PASSWORD, DB_NAME)
+    dbinfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+        db_config.Host, db_config.User, db_config.Pass, db_config.Name)
     db, err := sql.Open("postgres", dbinfo)
     checkErr(err)
     defer db.Close()

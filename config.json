@@ -1,0 +1,8 @@
+{
+  "HOST_IP": "0.0.0.0",
+  "DB_USER": "admin",
+  "DB_PASSWORD": "p@ssw0rd",
+  "DB_NAME": "awaresystems",
+  "Tolerancia": 3,
+  "Ventana": 10
+}

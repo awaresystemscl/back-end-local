@@ -8,13 +8,6 @@ import (
     // "strconv"
 )
 
-//Declaracion de la cuenta de la base de datos
-const (
-    DB_USER     = "awaresystems"
-    DB_PASSWORD = "3ee798d8"
-    DB_NAME     = "awaresystems"
-)
-
 //Crear como una Clase ApiDataTest
 type ApiDataTest struct {
     id int
@@ -106,8 +99,8 @@ type Estadistica_Percentil struct {
 
 //Se obtiene el ultimo test de cada API
 func getData() []ApiDataTest{
-    dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
-        DB_USER, DB_PASSWORD, DB_NAME)
+    dbinfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+        db_config.Host, db_config.User, db_config.Pass, db_config.Name)
     db, err := sql.Open("postgres", dbinfo)
     checkErr(err)
     defer db.Close()
@@ -148,8 +141,8 @@ func getData() []ApiDataTest{
 
 //otro metodo en el aire
 func setData( ep Estadistica_Percentil, categoria string) {
-    dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
-        DB_USER, DB_PASSWORD, DB_NAME)
+    dbinfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+        db_config.Host, db_config.User, db_config.Pass, db_config.Name)
     db, err := sql.Open("postgres", dbinfo)
     checkErr(err)
     defer db.Close()
@@ -163,8 +156,8 @@ func setData( ep Estadistica_Percentil, categoria string) {
 /*La categoria de la api es dada por la cantidad mas alta de registros de categoria
 que hayan echo los componentes que referencien a la api en particular*/
 func getCategoriaDeApi(api_nombre string) (string){
-    dbinfo := fmt.Sprintf("host=170.239.84.238 user=%s password=%s dbname=%s sslmode=disable",
-        DB_USER, DB_PASSWORD, DB_NAME)
+    dbinfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+        db_config.Host, db_config.User, db_config.Pass, db_config.Name)
     db, err := sql.Open("postgres", dbinfo)
     checkErr(err)
     defer db.Close()

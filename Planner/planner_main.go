@@ -3,11 +3,24 @@ package main
 import (
     "strconv"
     "fmt"
+    "encoding/json"
+    "io/ioutil"
 )
 type mashup struct {
     id int
     limite int
 }
+
+type configDB struct {
+    Host string `json:"HOST_IP"` 
+    User string `json:"DB_USER"`
+    Pass string `json:"DB_PASSWORD"`
+    Name string `json:"DB_NAME"`
+    Tolerancia int `json:"Tolerancia"`
+    Ventana int `json:"Ventana"`
+}
+
+var db_config configDB
 
 func masMenos(restriccion bool)string{
     if restriccion {
@@ -18,6 +31,7 @@ func masMenos(restriccion bool)string{
 }
 
 func main() {
+    db_config = configuracion()
 	alertas := getAlertas()
     for i, alerta := range alertas{
         fmt.Println(alerta)
@@ -54,4 +68,12 @@ func main() {
     send(mensaje,alerta.nombre,alerta.email)
     fmt.Println(mensaje)
     }
+}
+
+func configuracion() configDB{
+    jsonFile, err := ioutil.ReadFile("../config.json")
+    checkErr(err)
+    var config configDB
+    json.Unmarshal(jsonFile, &config)
+    return config
 }
